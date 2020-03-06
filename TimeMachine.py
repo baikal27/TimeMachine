@@ -131,11 +131,11 @@ class Ui_MainWindow(object):
                                                          directory=self.base_dir)
         if self.filepath:
             os.chdir(self.filepath)
-            self.texting = '파일 경로를 {}로 변경합니다.'.format(self.filepath)
+            self.texting = 'Change the path of file to {}.'.format(self.filepath)
             self.statusbar.showMessage(self.texting)
         else:
             os.chdir(self.base_dir)
-            self.texting = 'PATH를 눌러 파일 경로를 새로 지정해 주세요. 아니면 {}가 default 경로로 설정됩니다.'.format(self.base_dir)
+            self.texting = 'Press the PATH button. Or the default path {} will be set.'.format(self.base_dir)
             self.statusbar.showMessage(self.texting)
 
     def go_upload(self):
