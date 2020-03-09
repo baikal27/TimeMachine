@@ -13,6 +13,7 @@ import re
 import pandas as pd
 from PyQt5.QtWidgets import QFileDialog
 from PyQt5.QtCore import QAbstractTableModel, Qt
+from matplotlib import pyplot as plt, rcParams, font_manager
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -32,7 +33,7 @@ class Ui_MainWindow(object):
         self.select_month = QtWidgets.QComboBox(self.centralwidget)
         self.select_month.setGeometry(QtCore.QRect(140, 40, 104, 26))
         font = QtGui.QFont()
-        font.setPointSize(14)
+        font.setPointSize(12)
         self.select_month.setFont(font)
         self.select_month.setEditable(True)
         self.select_month.setDuplicatesEnabled(True)
@@ -40,27 +41,27 @@ class Ui_MainWindow(object):
         self.select_name = QtWidgets.QComboBox(self.centralwidget)
         self.select_name.setGeometry(QtCore.QRect(420, 40, 104, 26))
         font = QtGui.QFont()
-        font.setPointSize(14)
+        font.setPointSize(12)
         self.select_name.setFont(font)
         self.select_name.setEditable(True)
         self.select_name.setDuplicatesEnabled(True)
         self.select_name.setObjectName("select_name")
         self.lbl_start = QtWidgets.QLabel(self.centralwidget)
-        self.lbl_start.setGeometry(QtCore.QRect(110, 20, 161, 20))
+        self.lbl_start.setGeometry(QtCore.QRect(110, 17, 160, 20))
         font = QtGui.QFont()
-        font.setPointSize(18)
+        font.setPointSize(16)
         self.lbl_start.setFont(font)
         self.lbl_start.setAlignment(QtCore.Qt.AlignCenter)
         self.lbl_start.setObjectName("lbl_start")
         self.lbl_end = QtWidgets.QLabel(self.centralwidget)
-        self.lbl_end.setGeometry(QtCore.QRect(430, 20, 90, 20))
+        self.lbl_end.setGeometry(QtCore.QRect(390, 17, 160, 20))
         font = QtGui.QFont()
-        font.setPointSize(18)
+        font.setPointSize(16)
         self.lbl_end.setFont(font)
         self.lbl_end.setAlignment(QtCore.Qt.AlignCenter)
         self.lbl_end.setObjectName("lbl_end")
         self.tableview = QtWidgets.QTableView(self.centralwidget)
-        self.tableview.setGeometry(QtCore.QRect(20, 70, 643, 471))
+        self.tableview.setGeometry(QtCore.QRect(15, 70, 643, 471))
         self.tableview.setObjectName("tableview")
         self.btn_save_excel = QtWidgets.QPushButton(self.centralwidget)
         self.btn_save_excel.setGeometry(QtCore.QRect(665, 190, 130, 50))
@@ -75,13 +76,13 @@ class Ui_MainWindow(object):
         self.btn_path.setFont(font)
         self.btn_path.setObjectName("btn_path")
         self.btn_preview = QtWidgets.QPushButton(self.centralwidget)
-        self.btn_preview.setGeometry(QtCore.QRect(190, 540, 151, 50))
+        self.btn_preview.setGeometry(QtCore.QRect(190, 545, 150, 45))
         font = QtGui.QFont()
         font.setPointSize(18)
         self.btn_preview.setFont(font)
         self.btn_preview.setObjectName("btn_preview")
         self.btn_postview = QtWidgets.QPushButton(self.centralwidget)
-        self.btn_postview.setGeometry(QtCore.QRect(350, 540, 151, 50))
+        self.btn_postview.setGeometry(QtCore.QRect(350, 545, 150, 45))
         font = QtGui.QFont()
         font.setPointSize(18)
         self.btn_postview.setFont(font)
@@ -93,20 +94,28 @@ class Ui_MainWindow(object):
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         font = QtGui.QFont()
-        font.setPointSize(22)
+        font.setPointSize(16)
         self.statusbar.setFont(font)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
+
+        # 한글설정
+        #rcParams['font.sans-serif'] = 'Source Han Sans K'
+        #rcParams['font.weight'] = 'regular'
+        #rcParams['axes.titlesize'] = 15
+        #rcParams['ytick.labelsize'] = 12
+        #rcParams['xtick.labelsize'] = 12
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
         mon_items = [str(i) + '월' for i in range(1, 13)]
         self.select_month.addItems(mon_items)
-        name_items = ['전체', '안성진', '정종섭', '박형민', '이효동', '김다운', '김정은', '김태우', '신용철', '오최근',
+        name_items = sorted(['안성진', '정종섭', '박형민', '이효동', '김다운', '김정은', '김태우', '신용철', '오최근',
                       '유지현', '이상록', '정상은', '정신우', '최윤호', '하지성', '김소희', '박미소', '장현동',
                       '정훈', '최누리', '김범수', '하원혁', '김연수', '박솔빛나', '백형권', '최봉규', '천기범',
-                      '이분녀', '이채연', '유병규', '유준형', '금윤수', '김선희', '김현종', '오갑순', '임영우', '정재환']
+                      '이분녀', '이채연', '유병규', '유준형', '금윤수', '김선희', '김현종', '오갑순', '임영우', '정재환'])
+        name_items.insert(0, '전체')
         self.select_name.addItems(name_items)
 
         self.btn_path.clicked.connect(self.find_path)
@@ -163,6 +172,10 @@ class Ui_MainWindow(object):
             self.statusbar.showMessage(self.texting)
 
     def do_uploading(self):
+
+        self.texting = '{}의 {} 시간외근무근무 보상시간 계산을 시작합니다. \n'.format(self.name, self.month)
+        self.statusbar.showMessage(self.texting)
+
         sheetname = 'erp 신청데이터'
         appdata = pd.DataFrame([])
         col_list = []
@@ -459,15 +472,16 @@ class Ui_MainWindow(object):
         print(self.report_monthly.set_index(['부서', '이름']).sort_index())
 
         print(self.report_monthly.columns)
-        self.texting = 'All calculations are done successfully. \n'
+        self.texting = '{}의 {} 시간외근무근무 보상시간을 성공적으로 계산하였습니다. \n'.format(self.name, self.month)
         self.statusbar.showMessage(self.texting)
 
     def save_excel(self):
-        if os.path.exists('results') is False:
-            os.mkdir('results')
+        result_dir_name = 'result_excel'
+        if os.path.exists(result_dir_name) is False:
+            os.mkdir(result_dir_name)
 
         if self.code:
-            self.excel_dir = os.path.join(self.filepath, 'results')
+            self.excel_dir = os.path.join(self.filepath, result_dir_name)
             print(self.excel_dir)
             re_name_daily = '_'.join([self.month, self.name, 'daily.xlsx'])
             self.report2_daily.to_excel(os.path.join(self.excel_dir, re_name_daily), sheet_name='daily')
@@ -475,10 +489,10 @@ class Ui_MainWindow(object):
             re_name_monthly = '_'.join([self.month, self.name, 'monthly.xlsx'])
             self.report_monthly.to_excel(os.path.join(self.excel_dir, re_name_monthly), sheet_name='monthly')
             # columns = ["부서", "직급", "이름", "총보상시간", "금전보상시간", "휴가보상시간"])
-            self.texting = 'The files of {} and {} are restored in {} \n'.format(re_name_daily, re_name_monthly, self.excel_dir)
+            self.texting = '{}의 {} 시간외근무 보상시간을 일별({}), 월 합계({}) 파일로 {}에 저장하였습니다. \n'.format(self.name, self.month, re_name_daily, re_name_monthly, self.excel_dir)
             self.statusbar.showMessage(self.texting)
         else:
-            self.texting = 'There is no file to restore. Please check the input data and upload the data. \n'
+            self.texting = '저장할 엑셀파일이 없습니다. PATH와 입력자료를 다시 확인하세요. \n'
             self.statusbar.showMessage(self.texting)
 
     def preview(self):
@@ -487,10 +501,10 @@ class Ui_MainWindow(object):
             model = MyTableModel(self.report2_daily)
             self.tableview.setModel(model)
             self.tableview.show()
-            self.texting = 'Show the table of the daily award \n'
+            self.texting = '{}의 {} 일별 환산 결과를 보여줍니다.\n'.format(self.name, self.month)
             self.statusbar.showMessage(self.texting)
         else:
-            self.texting = 'There is no table to show. Please check the input data and upload the data\n'
+            self.texting = '보여줄 일별 환산 자료가 없습니다. PATH와 DATA UPLOAD를 다시 확인하세요.\n'
             self.statusbar.showMessage(self.texting)
 
 
@@ -500,10 +514,10 @@ class Ui_MainWindow(object):
             model = MyTableModel(self.report_monthly)
             self.tableview.setModel(model)
             self.tableview.show()
-            self.texting = 'Show the table of the monthly award \n'
+            self.texting = '{}의 {} 월 합산 결과를 보여줍니다.\n'.format(self.name, self.month)
             self.statusbar.showMessage(self.texting)
         else:
-            self.texting = 'There is no table to show. Please check the input data and upload the data \n'
+            self.texting = '보여줄 월 합산 자료가 없습니다. PATH와 DATA UPLOAD를 다시 확인하세요. \n'
             self.statusbar.showMessage(self.texting)
 
     def day(self, day, total_secs):
@@ -844,10 +858,10 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "TimeMachine"))
         self.btn_upload.setText(_translate("MainWindow", "Data Upload"))
-        self.lbl_start.setText(_translate("MainWindow", "Selection Month"))
-        self.lbl_end.setText(_translate("MainWindow", "Name"))
+        self.lbl_start.setText(_translate("MainWindow", "Select month"))
+        self.lbl_end.setText(_translate("MainWindow", "Select Name"))
         self.btn_save_excel.setText(_translate("MainWindow", "Save Excel"))
         self.btn_path.setText(_translate("MainWindow", "PATH"))
         self.btn_preview.setText(_translate("MainWindow", "Preview"))
