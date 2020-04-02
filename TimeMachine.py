@@ -277,11 +277,16 @@ class Ui_MainWindow(object):
             # print(reque_small.dtypes)
             # print(reque_small[['신청이름', '날짜']])
             # print(final_inout_small[['io이름', 'io날짜']])
-
+            print(reque_name)
             for reque_date in reque_date_list:
+                print(reque_date)
                 reque_indexraw = reque_small.loc[reque_small["날짜"] == reque_date].index
                 final_index = final_inout_small.loc[final_inout_small["io날짜"] == reque_date].index
+                print(final_index)
+                if final_index.empty:
+                    continue
                 final_index = final_index[0]
+                print(final_index)
 
                 for i in range(len(reque_indexraw)):
                     reque_index = reque_indexraw[i]
