@@ -83,7 +83,7 @@ pycodestyle==2.5.0
 pycrypto==2.6.1
 pydocstyle==4.0.1
 pyflakes==2.1.1
-Pygments==2.4.2
+Pygments==2.7.4
 PyInstaller==3.5
 pyparsing==2.4.5
 PyQt5==5.13.1
